@@ -1,0 +1,23 @@
+{
+    "name": "placebook/framework-basic",
+    "type": "library",
+    "description": "Basic classes for placebook's framework",
+    "authors": [
+        {
+            "name": "Andrey Davidovich",
+            "email": "cri2net@gmail.com"
+        }
+    ],
+    "require": {
+        "php": ">=5.4.0",
+        "cri2net/php-singleton": "^1.0"
+    },
+    "require-dev": {
+    },
+    "autoload": {
+        "psr-4": {
+            "Placebook\\Framework\\": "src"
+        }
+    },
+    "license": "proprietary"
+}
