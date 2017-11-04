@@ -80,12 +80,15 @@ class SystemConfig
 
     /**
      * Задаём значение в глобальных настройках
-     * @param  string $name Ключ в конфиге. Путь к более детальному конфигу можно делить через точку "."
-     *                      Например, lang или auth.google.clientId
-     * @param  mixed $value Значение
+     * @param  string $name          Ключ в конфиге. Путь к более детальному конфигу можно делить через точку "."
+     *                               Например, lang или auth.google.clientId
+     * @param  mixed   $value        Значение
+     * @param  boolean $save_to_file Нужно ли сохранять новое значение в файл (на постоянное хранение).
+     *                               По умолчанию true. Если указать false,
+     *                               то конфиг изменится только до конца выполнения скрипта. OPTIONAL
      * @return mixed
      */
-    public static function set($name, $value)
+    public static function set($name, $value, $save_to_file = true)
     {
         self::getInstance();
         $conf = $array = json_decode(json_encode(self::$config), true);
@@ -112,9 +115,13 @@ class SystemConfig
 
         $conf = array_merge($conf, $new);
         $new_json = json_encode($conf, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
-        file_put_contents(self::$configPath, $new_json);
 
-        self::reload();
+        if ($save_to_file) {
+            file_put_contents(self::$configPath, $new_json);
+            self::reload();
+        } else {
+            self::$config = json_decode($new_json);
+        }
 
         return true;
     }

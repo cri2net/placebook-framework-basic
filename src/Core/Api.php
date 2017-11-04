@@ -51,6 +51,13 @@ class Api
      */
     protected static function sendCurlRequest($data, $url, $token)
     {
+        $acceptLanguage = SystemConfig::get('acceptLanguage', '');
+        $headers = SystemConfig::get('api.extraHeaders', []);
+        
+        $headers[] = 'Content-Type: text/json';
+        $headers[] = "Authorization: $token";
+        $headers[] = "Accept-Language: $acceptLanguage";
+
         $ch = curl_init();
         $options = [
             CURLOPT_URL            => $url,
@@ -60,10 +67,7 @@ class Api
             CURLOPT_SSL_VERIFYPEER => false,
             CURLOPT_POSTFIELDS     => $data,
             CURLOPT_SSL_VERIFYHOST => false,
-            CURLOPT_HTTPHEADER     => [
-                'Content-Type: text/json',
-                "Authorization: $token",
-            ],
+            CURLOPT_HTTPHEADER     => $headers,
         ];
         
         curl_setopt_array($ch, $options);
@@ -82,13 +86,17 @@ class Api
      */
     protected static function sendFgetsRequest($data, $url, $token)
     {
+        $acceptLanguage = SystemConfig::get('acceptLanguage', '');
+        $headers = SystemConfig::get('api.extraHeaders', []);
+        
+        $headers[] = 'Content-Type: text/json';
+        $headers[] = "Authorization: $token";
+        $headers[] = "Accept-Language: $acceptLanguage";
+
         $context = stream_context_create([
             'http' => [
-                'method' => 'POST',
-                'header' => [
-                    'Content-Type: text/json',
-                    "Authorization: $token",
-                ],
+                'method'  => 'POST',
+                'header'  => $headers,
                 'content' => $data,
             ],
         ]);
