@@ -70,10 +70,12 @@ class Http
 
     /**
      * Выкачивание содержимого по ссылке через curl
-     * @param  string $url Ссылка
-     * @return string Содержимое
+     * @param  string $url              Ссылка
+     * @param  boolean $follow_location Управление опцией CURLOPT_FOLLOWLOCATION. OPTIONAL
+     * @param  array   $extra_headers   Задаёт дополнительные заголовки запроса через CURLOPT_HTTPHEADER. OPTIONAL
+     * @return string                   Содержимое
      */
-    public static function httpGet($url)
+    public static function httpGet($url, $follow_location = true, $extra_headers = [])
     {
         $ch = curl_init();
         $options = [
@@ -81,7 +83,11 @@ class Http
             CURLOPT_HEADER         => false,
             CURLOPT_HTTPGET        => true,
             CURLOPT_RETURNTRANSFER => true,
+            CURLOPT_FOLLOWLOCATION => $follow_location,
         ];
+        if (!empty($extra_headers)) {
+            $options[CURLOPT_HTTPHEADER] = $extra_headers;
+        }
 
         curl_setopt_array($ch, $options);
         $response = curl_exec($ch);
