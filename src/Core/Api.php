@@ -30,7 +30,7 @@ class Api
         $data = json_encode([
             'query'     => $query,
             'variables' => $variables,
-        ], JSON_UNESCAPED_UNICODE);
+        ], JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
 
         if (function_exists('curl_init')) {
             $response = self::sendCurlRequest($data, $api_url, $api_token);
@@ -114,7 +114,7 @@ class Api
         $res = '';
 
         foreach ($args as $key => $value) {
-            $res .= "$key: " . json_encode($value, JSON_UNESCAPED_UNICODE) . ',';
+            $res .= "$key: " . json_encode($value, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) . ',';
         }
 
         return trim($res, ',');
