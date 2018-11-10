@@ -51,12 +51,16 @@ class Api
      */
     protected static function sendCurlRequest($data, $url, $token)
     {
-        $acceptLanguage = SystemConfig::get('acceptLanguage', '');
-        $headers = SystemConfig::get('api.extraHeaders', []);
+        try {
+            $acceptLanguage = SystemConfig::get('acceptLanguage', '');
+            $headers = SystemConfig::get('api.extraHeaders', []);
+            $headers[] = "Accept-Language: $acceptLanguage";
+        } catch (Exception $e) {
+            $headers = [];
+        }
         
         $headers[] = 'Content-Type: text/json';
         $headers[] = "Authorization: $token";
-        $headers[] = "Accept-Language: $acceptLanguage";
 
         $ch = curl_init();
         $options = [
@@ -86,12 +90,16 @@ class Api
      */
     protected static function sendFgetsRequest($data, $url, $token)
     {
-        $acceptLanguage = SystemConfig::get('acceptLanguage', '');
-        $headers = SystemConfig::get('api.extraHeaders', []);
+        try {
+            $acceptLanguage = SystemConfig::get('acceptLanguage', '');
+            $headers = SystemConfig::get('api.extraHeaders', []);
+            $headers[] = "Accept-Language: $acceptLanguage";
+        } catch (Exception $e) {
+            $headers = [];
+        }
         
         $headers[] = 'Content-Type: text/json';
         $headers[] = "Authorization: $token";
-        $headers[] = "Accept-Language: $acceptLanguage";
 
         $context = stream_context_create([
             'http' => [
@@ -133,7 +141,6 @@ class Api
 
         $json = json_decode($response);
         if (($json === false) || ($json === null)) {
-            die($response);
             throw new Exception("Response is not valid JSON");
         }
 
