@@ -177,4 +177,34 @@ class Logger implements LoggerInterface
 
         return (isset($response->data->logAdd)) ? $response->data->logAdd : 0;
     }
+
+    public function shutdownHandler()
+    {
+        $error = error_get_last();
+
+        if (!empty($error) && isset($error['type'])) {
+
+            $context = $error;
+            unset($context['message']);
+            
+            switch ($error['type']) {
+                case E_ERROR:
+                case E_PARSE:
+                case E_CORE_ERROR:
+                case E_COMPILE_ERROR:
+                case E_USER_ERROR:
+                    $this->critical($error['message'], $context);
+                    break;
+                
+                case E_USER_WARNING:
+                case E_WARNING:
+                case E_STRICT:
+                case E_RECOVERABLE_ERROR:
+                    $this->error($error['message'], $context);
+                    break;
+                
+                default:
+            }
+        }
+    }
 }
