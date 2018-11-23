@@ -186,7 +186,8 @@ class Logger implements LoggerInterface
 
             $context = $error;
             unset($context['message']);
-            
+            $context['type'] = 'php_error';
+
             switch ($error['type']) {
                 case E_ERROR:
                 case E_PARSE:
