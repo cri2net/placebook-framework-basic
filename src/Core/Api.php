@@ -27,19 +27,17 @@ class Api
             throw new Exception("Please specifed url and token for API");
         }
 
-        $data = json_encode([
-            'query'     => $query,
-            'variables' => $variables,
-        ], JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
-
-        if (function_exists('curl_init')) {
-            $response = self::sendCurlRequest($data, $api_url, $api_token);
-        } else {
-            $response = self::sendFgetsRequest($data, $api_url, $api_token);
+        $data = ['query' => $query];
+        if (!empty($variables)) {
+            $data['variables'] = $variables;
         }
+        $data = json_encode($data, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
 
-        $response = self::processResponse($response);
-        return $response;
+        $response = (function_exists('curl_init'))
+            ? self::sendCurlRequest($data, $api_url, $api_token)
+            : self::sendFgetsRequest($data, $api_url, $api_token);
+
+        return self::processResponse($response);
     }
 
     /**
