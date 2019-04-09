@@ -37,7 +37,10 @@ class Api
             ? self::sendCurlRequest($data, $api_url, $api_token)
             : self::sendFgetsRequest($data, $api_url, $api_token);
 
-        return self::processResponse($response);
+        $response = self::processResponse($response, $response_array);
+        $as_array = SystemConfig::get('api.as_array', false);
+
+        return ($as_array) ? $response_array : $response;
     }
 
     /**
@@ -128,10 +131,11 @@ class Api
 
     /**
      * Обработка ответа от API
-     * @param  string $response Сырой ответ от API
+     * @param  string $response       Сырой ответ от API
+     * @param  mixed  $response_array Сырой ответ от API в виде массива. OPTIONAL
      * @return StdClass object
      */
-    public static function processResponse($response)
+    public static function processResponse($response, &$response_array = null)
     {
         if ($response === false) {
             throw new Exception("Response is false");
@@ -143,15 +147,17 @@ class Api
         }
 
         if (!empty($json->data->errors)) {
-            foreach ($json->data->errors as $error) {
 
-                if (isset($error->code)) {
-                    throw new Exception($error->message, $error->code);
-                } else {
-                    throw new Exception($error->message);
-                }
+            $error = $json->data->errors[0];
+            if (isset($error->code)) {
+                throw new Exception($error->message, $error->code);
+            } else {
+                throw new Exception($error->message);
             }
         }
+
+        $response_array = json_decode($response, true);
+        $response_array = $response_array['data'];
 
         return $json->data;
     }
