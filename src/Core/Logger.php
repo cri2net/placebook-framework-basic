@@ -12,7 +12,7 @@ class Logger implements LoggerInterface
      * Default API URL
      * @var string
      */
-    public $api_url = 'http://api.logger.microservices.placebook.com.ua/api/';
+    public $api_url = 'https://api.logger.microservices.placebook.com.ua/api/';
 
     /**
      * Токен доступа к API
