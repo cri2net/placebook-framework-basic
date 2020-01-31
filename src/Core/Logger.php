@@ -153,6 +153,11 @@ class Logger implements LoggerInterface
      */
     public function log($level, $message, array $context = [])
     {
+        // can't send without API token
+        if (empty($this->api_token)) {
+            return;
+        }
+
         $data = [
             'level'   => $level,
             'message' => $message,
@@ -187,6 +192,13 @@ class Logger implements LoggerInterface
             $context = $error;
             unset($context['message']);
             $context['type'] = 'php_error';
+
+            $context['headers'] = function_exists('\getallheaders') ? \getallheaders() : Http::getAllHeaders();
+            $context['_SESSION'] = $_SESSION;
+            $context['_GET'] = $_GET;
+            $context['_POST'] = $_POST;
+            $context['_FILES'] = $_FILES;
+            $context['_SERVER'] = $_SERVER;
 
             switch ($error['type']) {
                 case E_ERROR:

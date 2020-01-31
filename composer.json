@@ -13,6 +13,9 @@
         "psr/log": "^1.0",
         "cri2net/php-singleton": "^1.0"
     },
+    "provide":{
+        "psr/log-implementation": "1.0.0"
+    },
     "require-dev": {
     },
     "autoload": {
