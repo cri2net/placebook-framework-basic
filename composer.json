@@ -23,5 +23,5 @@
             "Placebook\\Framework\\": "src"
         }
     },
-    "license": "proprietary"
+    "license": "MIT"
 }
