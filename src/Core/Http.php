@@ -48,7 +48,7 @@ class Http
             }
             $content = $data;
         } else {
-            $content = gzencode(trim(preg_replace('/\s+/', ' ', $data)), 9);
+            $content = gzencode($data, 9);
         }
 
         if (!$echo) {
@@ -83,6 +83,8 @@ class Http
             CURLOPT_HEADER         => false,
             CURLOPT_HTTPGET        => true,
             CURLOPT_RETURNTRANSFER => true,
+            CURLOPT_SSL_VERIFYPEER => false,
+            CURLOPT_SSL_VERIFYHOST => false,
             CURLOPT_FOLLOWLOCATION => $follow_location,
         ];
         if (!empty($extra_headers)) {
@@ -160,6 +162,10 @@ class Http
      */
     public static function getAllHeaders()
     {
+        if (function_exists('\\getallheaders')) {
+            return \getallheaders();
+        }
+        
         $headers = [];
         $copy_server = [
             'CONTENT_TYPE'   => 'Content-Type',
