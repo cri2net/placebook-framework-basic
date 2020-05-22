@@ -33,14 +33,12 @@ class Http
      * @param  boolean $echo         need echo. OPTIONAL
      * @param  string  $content_type Content-type for header. OPTIONAL
      * @param  string  $charset      charset of $data. OPTIONAL
-     * @param  integer $offset       offset for expire header. OPTIONAL
      * 
      * @return void | string
      */
-    public static function gzip($data, $echo = true, $content_type = 'text/html', $charset = 'UTF-8', $offset = 1209600)
+    public static function gzip($data, $echo = true, $content_type = 'text/html', $charset = 'UTF-8')
     {
         $supportsGzip = (strpos($_SERVER['HTTP_ACCEPT_ENCODING'], 'gzip') !== false) && function_exists('gzencode');
-        $expire = "expires: " . gmdate("D, d M Y H:i:s", time() + $offset) . " GMT";
         
         if (!$supportsGzip) {
             if (!$echo) {
@@ -61,8 +59,6 @@ class Http
         }
         
         header("Content-type: $content_type; charset: $charset");
-        header("cache-control: must-revalidate");
-        header($expire);
         header('Content-Length: ' . strlen($content));
 
         echo $content;
