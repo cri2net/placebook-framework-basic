@@ -38,7 +38,11 @@ class Http
      */
     public static function gzip($data, $echo = true, $content_type = 'text/html', $charset = 'UTF-8')
     {
-        $supportsGzip = (strpos($_SERVER['HTTP_ACCEPT_ENCODING'], 'gzip') !== false) && function_exists('gzencode');
+        $supportsGzip = (
+            isset($_SERVER['HTTP_ACCEPT_ENCODING'])
+            && (strpos($_SERVER['HTTP_ACCEPT_ENCODING'], 'gzip') !== false)
+            && function_exists('gzencode')
+        );
         
         if (!$supportsGzip) {
             if (!$echo) {
