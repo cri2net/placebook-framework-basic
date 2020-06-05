@@ -2,17 +2,17 @@
 
 namespace Placebook\Framework\Core;
 
-use \Exception;
+use Exception;
 
 class Api
 {
     /**
-     * Отправка готового запроса к API
-     * @param  string $query     Текст запроса в GraphQL
-     * @param  array  $variables Массив с переменными. OPTIONAL
-     * @param  string $api_url   Ссылка на API. OPTIONAL
-     * @param  string $api_token Токен для доступа к API. OPTIONAL
-     * @return StdClass object   Ответ от API
+     * Send request to API
+     * @param  string $query     GraphQL query
+     * @param  array  $variables Array with variables. OPTIONAL
+     * @param  string $api_url   API URL. OPTIONAL
+     * @param  string $api_token API token. OPTIONAL
+     * @return StdClass object   response from API
      */
     public static function rawRequest($query, $variables = [], $api_url = null, $api_token = null)
     {
@@ -38,26 +38,31 @@ class Api
             : self::sendFgetsRequest($data, $api_url, $api_token);
 
         $response = self::processResponse($response, $response_array);
-        $as_array = SystemConfig::get('api.as_array', false);
+        try {
+            $as_array = SystemConfig::get('api.as_array', false);
+        } catch (Exception $e) {
+            $as_array = false;
+        }
 
         return ($as_array) ? $response_array : $response;
     }
 
     /**
-     * Отправляет подготовленный запрос к API через cURL
-     * @param  string $data  JSON строка с запросом
-     * @param  string $url   Ссылка на API
-     * @param  string $token Токен для доступа к API
-     * @return string        Ответ от API
+     * Send request to API via cURL
+     * @param  string $data  GraphQL string with request
+     * @param  string $url   API URL
+     * @param  string $token API token
+     * @return string        Raw response
      */
     protected static function sendCurlRequest($data, $url, $token)
     {
+        $headers = [];
+
         try {
             $acceptLanguage = SystemConfig::get('acceptLanguage', '');
             $headers = SystemConfig::get('api.extraHeaders', []);
             $headers[] = "Accept-Language: $acceptLanguage";
         } catch (Exception $e) {
-            $headers = [];
         }
         
         $headers[] = 'Content-Type: text/json';
@@ -83,23 +88,24 @@ class Api
     }
     
     /**
-     * Отправляет подготовленный запрос к API через file_get_contents
-     * @param  string $data  JSON строка с запросом
-     * @param  string $url   Ссылка на API
-     * @param  string $token Токен для доступа к API
-     * @return string        Ответ от API
+     * Send request to API via file_get_contents
+     * @param  string $data  GraphQL string with request
+     * @param  string $url   API URL
+     * @param  string $token API token
+     * @return string        Raw response
      */
     protected static function sendFgetsRequest($data, $url, $token)
     {
+        $headers = [];
+
         try {
             $acceptLanguage = SystemConfig::get('acceptLanguage', '');
             $headers = SystemConfig::get('api.extraHeaders', []);
             $headers[] = "Accept-Language: $acceptLanguage";
         } catch (Exception $e) {
-            $headers = [];
         }
         
-        $headers[] = 'Content-Type: text/json';
+        $headers[] = 'Content-Type: application/json';
         $headers[] = "Authorization: $token";
 
         $context = stream_context_create([
@@ -114,9 +120,9 @@ class Api
     }
 
     /**
-     * Кодирует аргументы в строку, чтоб не нарушился синтаксис GraphQL
-     * @param  array  $args Ассоциативный массив с аргументами
-     * @return string Строка с закодированными аргументами
+     * Encode args to GraphQL string
+     * @param  array  $args assoc array with args
+     * @return string Args in GraphQL string
      */
     public static function encodeArguments(array $args)
     {
@@ -130,9 +136,9 @@ class Api
     }
 
     /**
-     * Обработка ответа от API
-     * @param  string $response       Сырой ответ от API
-     * @param  mixed  $response_array Сырой ответ от API в виде массива. OPTIONAL
+     * Process response from API
+     * @param  string $response       Raw response from API
+     * @param  mixed  $response_array Raw response from API as array. OPTIONAL
      * @return StdClass object
      */
     public static function processResponse($response, &$response_array = null)

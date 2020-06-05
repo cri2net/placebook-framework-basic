@@ -2,7 +2,7 @@
 
 namespace Placebook\Framework\Core;
 
-use \Exception;
+use Exception;
 use Psr\Log\LoggerInterface;
 use Psr\Log\LogLevel;
 
@@ -194,7 +194,7 @@ class Logger implements LoggerInterface
             $context['type'] = 'php_error';
 
             $context['headers'] = function_exists('\getallheaders') ? \getallheaders() : Http::getAllHeaders();
-            $context['_SESSION'] = $_SESSION;
+            $context['_SESSION'] = @$_SESSION;
             $context['_GET'] = $_GET;
             $context['_POST'] = $_POST;
             $context['_FILES'] = $_FILES;

@@ -2,8 +2,8 @@
 
 namespace Placebook\Framework\Core;
 
-use \Exception;
-use \cri2net\php_singleton\Singleton;
+use Exception;
+use cri2net\php_singleton\Singleton;
 
 class SystemConfig
 {

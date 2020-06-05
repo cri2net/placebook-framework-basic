@@ -2,7 +2,7 @@
 
 namespace Placebook\Framework\Core;
 
-use \Exception;
+use Exception;
 
 class Http
 {
@@ -134,7 +134,7 @@ class Http
      * @param  array  $data   Передаваемые данные в запросе. OPTIONAL
      * @return string Содержимое (сырой ответ)
      */
-    public static function fgets($url, $method = 'GET', $data = array())
+    public static function fgets($url, $method = 'GET', $data = [])
     {
         $data = http_build_query($data);
 
