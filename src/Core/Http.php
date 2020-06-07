@@ -154,9 +154,8 @@ class Http
     }
 
     /**
-     * Метод парсит переменную $_SERVER и генерирует массив с HTTP Заголовками запроса
-     * Как аналог \getallheaders(), но она доступна только при работе php из-под apache
-     * @link https://github.com/ralouphie/getallheaders/ Оригинальный код функции
+     * Polyfill for \getallheaders() function
+     * @link https://github.com/ralouphie/getallheaders/ Original function
      * 
      * @return array http headers
      */

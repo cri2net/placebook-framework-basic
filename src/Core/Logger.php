@@ -15,14 +15,14 @@ class Logger implements LoggerInterface
     public $api_url = 'https://logger.microservices.placebook.com.ua/api/';
 
     /**
-     * Токен доступа к API
+     * API token
      * @var string
      */
     public $api_token = null;
 
     /**
      * Constructor
-     * @param string $api_token Токен доступа к API
+     * @param string $api_token API token
      */
     public function __construct($api_token)
     {
@@ -145,10 +145,10 @@ class Logger implements LoggerInterface
     }
 
     /**
-     * Создание лога по API
-     * @param  string $level   Важность лога
-     * @param  string $message Сообщение
-     * @param  array  $context Массив с дополнительными данными
+     * Create a log via API
+     * @param  string $level   Log Level
+     * @param  string $message Message
+     * @param  array  $context Array with additional data
      * @return integer Log ID
      */
     public function log($level, $message, array $context = [])

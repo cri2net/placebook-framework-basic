@@ -65,7 +65,7 @@ class Api
         } catch (Exception $e) {
         }
         
-        $headers[] = 'Content-Type: text/json';
+        $headers[] = 'Content-Type: application/json';
         $headers[] = "Authorization: $token";
 
         $ch = curl_init();
