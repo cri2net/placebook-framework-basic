@@ -147,24 +147,21 @@ class Api
             throw new Exception("Response is false");
         }
 
-        $json = json_decode($response);
+        $json = @json_decode($response);
         if (($json === false) || ($json === null)) {
             throw new Exception("Response is not valid JSON");
         }
 
-        if (!empty($json->data->errors)) {
+        $json = (isset($json->data->data) || isset($json->data->errors)) ? $json->data : $json;
 
-            $error = $json->data->errors[0];
-            if (isset($error->code)) {
-                throw new Exception($error->message, $error->code);
-            } else {
-                throw new Exception($error->message);
-            }
+        if (!empty($json->errors)) {
+            $code = (isset($json->errors[0]->code)) ? $json->errors[0]->code : 0;
+            throw new Exception($json->errors[0]->message, $code);
         }
 
         $response_array = json_decode($response, true);
-        $response_array = $response_array['data'];
+        $response_array = (isset($response_array['data']['data'])) ? $response_array['data'] : $response_array;
 
-        return $json->data;
+        return $json;
     }
 }

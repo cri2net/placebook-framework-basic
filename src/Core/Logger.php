@@ -177,7 +177,11 @@ class Logger implements LoggerInterface
             $args = Api::encodeArguments($args);
             $response = Api::rawRequest("mutation { logAdd($args) }", [], $this->api_url, $this->api_token);
         } catch (Exception $e) {
-            return false;
+            return 0;
+        }
+
+        if (is_array($response)) {
+            return (isset($response['data']['logAdd'])) ? $response['data']['logAdd'] : 0;
         }
 
         return (isset($response->data->logAdd)) ? $response->data->logAdd : 0;
@@ -193,7 +197,7 @@ class Logger implements LoggerInterface
             unset($context['message']);
             $context['type'] = 'php_error';
 
-            $context['headers'] = function_exists('\getallheaders') ? \getallheaders() : Http::getAllHeaders();
+            $context['headers'] = Http::getAllHeaders();
             $context['_SESSION'] = @$_SESSION;
             $context['_GET'] = $_GET;
             $context['_POST'] = $_POST;
