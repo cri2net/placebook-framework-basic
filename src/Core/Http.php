@@ -7,13 +7,13 @@ use Exception;
 class Http
 {
     /**
-     * Отправка заголовков для редиректа
-     * @param  string  $location    Новая ссылка
-     * @param  boolean $permanently Постоянный редирект (301, по умолчанию) или временный (307). OPTIONAL
-     * @param  boolean $exit        Нужно ли завершить работу. OPTIONAL
+     * Sending headers to redirect
+     * @param  string  $location    New location
+     * @param  boolean $permanently Permanent redirect (301, by default) or temporary (307). OPTIONAL
+     * @param  boolean $exit        Do I need to complete the work. OPTIONAL
      * @return void
      */
-    public static function redirect($location, $permanently = true, $exit = true)
+    public static function redirect(string $location, bool $permanently = true, bool $exit = true)
     {
         if ($permanently) {
             header("HTTP/1.1 301 Moved Permanently");
@@ -36,7 +36,12 @@ class Http
      * 
      * @return void | string
      */
-    public static function gzip($data, $echo = true, $content_type = 'text/html', $charset = 'UTF-8')
+    public static function gzip(
+        string $data,
+        bool $echo = true,
+        string $content_type = 'text/html',
+        string $charset = 'UTF-8'
+    )
     {
         $supportsGzip = (
             isset($_SERVER['HTTP_ACCEPT_ENCODING'])
@@ -69,13 +74,13 @@ class Http
     }
 
     /**
-     * Выкачивание содержимого по ссылке через curl
-     * @param  string $url              Ссылка
-     * @param  boolean $follow_location Управление опцией CURLOPT_FOLLOWLOCATION. OPTIONAL
-     * @param  array   $extra_headers   Задаёт дополнительные заголовки запроса через CURLOPT_HTTPHEADER. OPTIONAL
-     * @return string                   Содержимое
+     * Downloading content by reference via curl
+     * @param  string $url              URL
+     * @param  boolean $follow_location Value for CURLOPT_FOLLOWLOCATION. OPTIONAL
+     * @param  array   $extra_headers   Sets additional request headers via CURLOPT_HTTPHEADER. OPTIONAL
+     * @return string                   Response
      */
-    public static function httpGet($url, $follow_location = true, $extra_headers = [])
+    public static function httpGet(string $url, bool $follow_location = true, array $extra_headers = [])
     {
         $ch = curl_init();
         $options = [
@@ -99,12 +104,12 @@ class Http
     }
     
     /**
-     * POST запрос через curl
-     * @param  string       $url Ссылка
-     * @param  array|string $data Данные
-     * @return string Ответ
+     * POST request via curl
+     * @param  string       $url  URL
+     * @param  array|string $data Data
+     * @return string             Response
      */
-    public static function httpPost($url, $data)
+    public static function httpPost(string $url, $data)
     {
         $data = (is_array($data)) ? http_build_query($data) : $data;
 
@@ -127,14 +132,13 @@ class Http
     }
 
     /**
-     * Выкачивание содержимого через file_get_contents
-     * С подстановкой User-Agent, как будто браузер
-     * @param  string $url    HTTP cсылка
-     * @param  string $method Тип HTTP запроса. OPTIONAL
-     * @param  array  $data   Передаваемые данные в запросе. OPTIONAL
-     * @return string Содержимое (сырой ответ)
+     * Downloading content by reference via file_get_contents with User-Agent, like a browser
+     * @param  string $url    URL
+     * @param  string $method HTTP type of request. OPTIONAL
+     * @param  array  $data   Data. OPTIONAL
+     * @return string         Raw response
      */
-    public static function fgets($url, $method = 'GET', $data = [])
+    public static function fgets(string $url, string $method = 'GET', array $data = [])
     {
         $data = http_build_query($data);
 
@@ -159,7 +163,7 @@ class Http
      * 
      * @return array http headers
      */
-    public static function getAllHeaders()
+    public static function getAllHeaders() : array
     {
         if (function_exists('\\getallheaders')) {
             return \getallheaders();

@@ -18,7 +18,7 @@ class SystemConfig
     }
 
     /**
-     * Инициализация конфига (чтение из файла)
+     * Initialization of a config (reading from a file)
      * @return void
      */
     private static function init()
@@ -39,7 +39,7 @@ class SystemConfig
     }
 
     /**
-     * Перезагружает конфиг из файла. Полезно при изменении конфига
+     * Reloads the config from the file. Useful when changing the config.
      * @return void
      */
     public static function reload()
@@ -49,13 +49,13 @@ class SystemConfig
     }
 
     /**
-     * Получаем значение из глобальных настроек
-     * @param  string $name    Ключ в конфиге. Путь к более детальному конфигу можно делить через точку "."
-     *                         Например, lang или auth.google.clientId
-     * @param  mixed $default  Значение по умолчанию, если в конфиге запрашиваемое значение не найдено
+     * Get the value from the global settings.
+     * @param  string $name    The key in the config. The path to a more detailed config can be divided through a dot "."
+     *                         For example, lang or auth.google.clientId
+     * @param  mixed $default  Default value, if the requested value is not found in the config
      * @return mixed
      */
-    public static function get($name, $default)
+    public static function get(string $name, $default)
     {
         self::getInstance();
 
@@ -79,16 +79,16 @@ class SystemConfig
     }
 
     /**
-     * Задаём значение в глобальных настройках
-     * @param  string $name          Ключ в конфиге. Путь к более детальному конфигу можно делить через точку "."
-     *                               Например, lang или auth.google.clientId
-     * @param  mixed   $value        Значение
-     * @param  boolean $save_to_file Нужно ли сохранять новое значение в файл (на постоянное хранение).
-     *                               По умолчанию true. Если указать false,
-     *                               то конфиг изменится только до конца выполнения скрипта. OPTIONAL
+     * Set the value in global settings
+     * @param  string $name          The key in the config. The path to a more detailed config can be divided through a dot "."
+     *                               For example, lang or auth.google.clientId
+     * @param  mixed   $value        Value
+     * @param  boolean $save_to_file Do I need to save the new value to a file (for permanent storage).
+     *                               By default is true. If set to false,
+     *                               then the config will only change until the end of the script. OPTIONAL
      * @return mixed
      */
-    public static function set($name, $value, $save_to_file = true)
+    public static function set(string $name, $value, bool $save_to_file = true)
     {
         self::getInstance();
         $conf = $array = json_decode(json_encode(self::$config), true);

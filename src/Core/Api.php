@@ -12,9 +12,9 @@ class Api
      * @param  array  $variables Array with variables. OPTIONAL
      * @param  string $api_url   API URL. OPTIONAL
      * @param  string $api_token API token. OPTIONAL
-     * @return StdClass object   response from API
+     * @return array             Response from API
      */
-    public static function rawRequest($query, $variables = [], $api_url = null, $api_token = null)
+    public static function rawRequest(string $query, array $variables = [], string $api_url = null, string $api_token = null) : array
     {
         if (($api_url === null) && defined('API_URL')) {
             $api_url = API_URL;
@@ -37,14 +37,7 @@ class Api
             ? self::sendCurlRequest($data, $api_url, $api_token)
             : self::sendFgetsRequest($data, $api_url, $api_token);
 
-        $response = self::processResponse($response, $response_array);
-        try {
-            $as_array = SystemConfig::get('api.as_array', false);
-        } catch (Exception $e) {
-            $as_array = false;
-        }
-
-        return ($as_array) ? $response_array : $response;
+        return self::processResponse($response);
     }
 
     /**
@@ -54,7 +47,7 @@ class Api
      * @param  string $token API token
      * @return string        Raw response
      */
-    protected static function sendCurlRequest($data, $url, $token)
+    protected static function sendCurlRequest(string $data, string $url, string $token)
     {
         $headers = [];
 
@@ -94,7 +87,7 @@ class Api
      * @param  string $token API token
      * @return string        Raw response
      */
-    protected static function sendFgetsRequest($data, $url, $token)
+    protected static function sendFgetsRequest(string $data, string $url, string $token)
     {
         $headers = [];
 
@@ -124,7 +117,7 @@ class Api
      * @param  array  $args assoc array with args
      * @return string Args in GraphQL string
      */
-    public static function encodeArguments(array $args)
+    public static function encodeArguments(array $args) : string
     {
         $res = '';
 
@@ -137,30 +130,24 @@ class Api
 
     /**
      * Process response from API
-     * @param  string $response       Raw response from API
-     * @param  mixed  $response_array Raw response from API as array. OPTIONAL
-     * @return StdClass object
+     * @param  string $response Raw response from API
+     * @return array  Response
      */
-    public static function processResponse($response, &$response_array = null)
+    public static function processResponse(string $response) : array
     {
         if ($response === false) {
             throw new Exception("Response is false");
         }
 
-        $json = @json_decode($response);
+        $json = @json_decode($response, true);
         if (($json === false) || ($json === null)) {
             throw new Exception("Response is not valid JSON");
         }
 
-        $json = (isset($json->data->data) || isset($json->data->errors)) ? $json->data : $json;
-
-        if (!empty($json->errors)) {
-            $code = (isset($json->errors[0]->code)) ? $json->errors[0]->code : 0;
-            throw new Exception($json->errors[0]->message, $code);
+        if (!empty($json['errors'])) {
+            $code = $json['errors'][0]['code'] ?? 0;
+            throw new Exception($json['errors'][0]['message'], $code);
         }
-
-        $response_array = json_decode($response, true);
-        $response_array = (isset($response_array['data']['data'])) ? $response_array['data'] : $response_array;
 
         return $json;
     }

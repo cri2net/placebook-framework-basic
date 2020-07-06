@@ -24,7 +24,7 @@ class Logger implements LoggerInterface
      * Constructor
      * @param string $api_token API token
      */
-    public function __construct($api_token)
+    public function __construct(string $api_token)
     {
         $this->api_token = $api_token;
     }
