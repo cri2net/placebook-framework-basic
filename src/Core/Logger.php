@@ -12,7 +12,7 @@ class Logger implements LoggerInterface
      * Default API URL
      * @var string
      */
-    public $api_url = 'https://logger.microservices.placebook.com.ua/api/';
+    public $api_url = 'https://logger.tinycdn.cloud/api/';
 
     /**
      * API token

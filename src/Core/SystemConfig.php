@@ -114,7 +114,7 @@ class SystemConfig
         }
 
         $conf = array_merge($conf, $new);
-        $new_json = json_encode($conf, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
+        $new_json = json_encode($conf, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
 
         if ($save_to_file) {
             file_put_contents(self::$configPath, $new_json);
