@@ -9,9 +9,14 @@
         }
     ],
     "require": {
-        "php": "^7.0",
+        "php": "^7.0|^8.0",
+        "ext-json": "*",
+        "ext-zlib": "*",
         "psr/log": "^1.0",
         "cri2net/php-singleton": "^1.0"
+    },
+    "suggest": {
+        "ext-curl": "for sending request via curl"
     },
     "provide":{
         "psr/log-implementation": "1.0.0"
