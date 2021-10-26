@@ -14,6 +14,8 @@ class Logger implements LoggerInterface
      */
     public $api_url = 'https://logger.tinycdn.cloud/api/';
 
+    public $addedLogId = null;
+
     /**
      * API token
      * @var string
@@ -35,11 +37,11 @@ class Logger implements LoggerInterface
      * @param string $message
      * @param array  $context
      *
-     * @return integer Log ID
+     * @return void
      */
-    public function emergency($message, array $context = [])
+    public function emergency($message, array $context = []): void
     {
-        return $this->log(LogLevel::EMERGENCY, $message, $context);
+        $this->log(LogLevel::EMERGENCY, $message, $context);
     }
 
     /**
@@ -51,11 +53,11 @@ class Logger implements LoggerInterface
      * @param string $message
      * @param array  $context
      *
-     * @return integer Log ID
+     * @return void
      */
-    public function alert($message, array $context = [])
+    public function alert($message, array $context = []): void
     {
-        return $this->log(LogLevel::ALERT, $message, $context);
+        $this->log(LogLevel::ALERT, $message, $context);
     }
 
     /**
@@ -66,11 +68,11 @@ class Logger implements LoggerInterface
      * @param string $message
      * @param array  $context
      *
-     * @return integer Log ID
+     * @return void
      */
-    public function critical($message, array $context = [])
+    public function critical($message, array $context = []): void
     {
-        return $this->log(LogLevel::CRITICAL, $message, $context);
+        $this->log(LogLevel::CRITICAL, $message, $context);
     }
 
     /**
@@ -80,11 +82,11 @@ class Logger implements LoggerInterface
      * @param string $message
      * @param array  $context
      *
-     * @return integer Log ID
+     * @return void
      */
-    public function error($message, array $context = [])
+    public function error($message, array $context = []): void
     {
-        return $this->log(LogLevel::ERROR, $message, $context);
+        $this->log(LogLevel::ERROR, $message, $context);
     }
 
     /**
@@ -96,11 +98,11 @@ class Logger implements LoggerInterface
      * @param string $message
      * @param array  $context
      *
-     * @return integer Log ID
+     * @return void
      */
-    public function warning($message, array $context = [])
+    public function warning($message, array $context = []): void
     {
-        return $this->log(LogLevel::WARNING, $message, $context);
+        $this->log(LogLevel::WARNING, $message, $context);
     }
 
     /**
@@ -109,11 +111,11 @@ class Logger implements LoggerInterface
      * @param string $message
      * @param array  $context
      *
-     * @return integer Log ID
+     * @return void
      */
-    public function notice($message, array $context = [])
+    public function notice($message, array $context = []): void
     {
-        return $this->log(LogLevel::NOTICE, $message, $context);
+        $this->log(LogLevel::NOTICE, $message, $context);
     }
 
     /**
@@ -124,11 +126,11 @@ class Logger implements LoggerInterface
      * @param string $message
      * @param array  $context
      *
-     * @return integer Log ID
+     * @return void
      */
-    public function info($message, array $context = [])
+    public function info($message, array $context = []): void
     {
-        return $this->log(LogLevel::INFO, $message, $context);
+        $this->log(LogLevel::INFO, $message, $context);
     }
 
     /**
@@ -137,11 +139,11 @@ class Logger implements LoggerInterface
      * @param string $message
      * @param array  $context
      *
-     * @return integer Log ID
+     * @return void
      */
-    public function debug($message, array $context = [])
+    public function debug($message, array $context = []): void
     {
-        return $this->log(LogLevel::DEBUG, $message, $context);
+        $this->log(LogLevel::DEBUG, $message, $context);
     }
 
     /**
@@ -149,42 +151,40 @@ class Logger implements LoggerInterface
      * @param  string $level   Log Level
      * @param  string $message Message
      * @param  array  $context Array with additional data
-     * @return integer Log ID
+     * @return void
      */
-    public function log($level, $message, array $context = [])
+    public function log($level, $message, array $context = []): void
     {
         // can't send without API token
-        if (empty($this->api_token)) {
-            return;
+        if (!empty($this->api_token)) {
+            $data = [
+                'level'   => $level,
+                'message' => $message,
+                'context' => $context,
+            ];
+
+            $args = [];
+
+            if (function_exists('gzcompress')) {
+                $args['gzcompress'] = true;
+                $args['content_base64'] = base64_encode(gzcompress(serialize($data), 9));
+            } else {
+                $args['content_base64'] = base64_encode(serialize($data));
+            }
+
+            try {
+                $args = Api::encodeArguments($args);
+                $response = Api::rawRequest("mutation { logAdd($args) }", [], $this->api_url, $this->api_token);
+            } catch (Exception $e) {
+                $this->addedLogId = 0;
+            }
+
+            if (is_array($response)) {
+                $this->addedLogId = $response['data']['logAdd'] ?? 0;
+            }
         }
 
-        $data = [
-            'level'   => $level,
-            'message' => $message,
-            'context' => $context,
-        ];
-
-        $args = [];
-
-        if (function_exists('gzcompress')) {
-            $args['gzcompress'] = true;
-            $args['content_base64'] = base64_encode(gzcompress(serialize($data), 9));
-        } else {
-            $args['content_base64'] = base64_encode(serialize($data));
-        }
-
-        try {
-            $args = Api::encodeArguments($args);
-            $response = Api::rawRequest("mutation { logAdd($args) }", [], $this->api_url, $this->api_token);
-        } catch (Exception $e) {
-            return 0;
-        }
-
-        if (is_array($response)) {
-            return (isset($response['data']['logAdd'])) ? $response['data']['logAdd'] : 0;
-        }
-
-        return (isset($response->data->logAdd)) ? $response->data->logAdd : 0;
+        $this->addedLogId = $response->data->logAdd ?? 0;
     }
 
     public function shutdownHandler()
