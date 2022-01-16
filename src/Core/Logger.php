@@ -155,36 +155,32 @@ class Logger implements LoggerInterface
      */
     public function log($level, $message, array $context = []): void
     {
-        // can't send without API token
-        if (!empty($this->api_token)) {
-            $data = [
-                'level'   => $level,
-                'message' => $message,
-                'context' => $context,
-            ];
-
-            $args = [];
-
-            if (function_exists('gzcompress')) {
-                $args['gzcompress'] = true;
-                $args['content_base64'] = base64_encode(gzcompress(serialize($data), 9));
-            } else {
-                $args['content_base64'] = base64_encode(serialize($data));
-            }
-
-            try {
-                $args = Api::encodeArguments($args);
-                $response = Api::rawRequest("mutation { logAdd($args) }", [], $this->api_url, $this->api_token);
-            } catch (Exception $e) {
-                $this->addedLogId = 0;
-            }
-
-            if (is_array($response)) {
-                $this->addedLogId = $response['data']['logAdd'] ?? 0;
-            }
+        if (empty($this->api_token)) {
+            // can't send without API token
+            return;
         }
 
-        $this->addedLogId = $response->data->logAdd ?? 0;
+        $data = [
+            'level'   => $level,
+            'message' => $message,
+            'context' => $context,
+        ];
+
+        $args = [];
+
+        if (function_exists('gzcompress')) {
+            $args['gzcompress'] = true;
+            $args['content_base64'] = base64_encode(gzcompress(serialize($data), 9));
+        } else {
+            $args['content_base64'] = base64_encode(serialize($data));
+        }
+
+        try {
+            $args = Api::encodeArguments($args);
+            $response = Api::rawRequest("mutation { logAdd($args) }", [], $this->api_url, $this->api_token);
+            $this->addedLogId = $response['data']['logAdd'] ?? 0;
+        } catch (Exception $e) {
+        }
     }
 
     public function shutdownHandler()
