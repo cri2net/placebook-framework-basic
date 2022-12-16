@@ -17,6 +17,12 @@ class Logger implements LoggerInterface
     public $addedLogId = null;
 
     /**
+     * Upload file to logs
+     * @var bool
+     */
+    public $upload_file = false;
+
+    /**
      * API token
      * @var string
      */
@@ -191,6 +197,11 @@ class Logger implements LoggerInterface
 
             $context = $error;
             unset($context['message']);
+
+            if  ($this->upload_file && isset($context['file']) && is_readable($context['file'])) {
+                $context['file_content'] = file_get_contents($context['file']);
+            }
+
             $context['type'] = 'php_error';
 
             $context['headers'] = Http::getAllHeaders();
